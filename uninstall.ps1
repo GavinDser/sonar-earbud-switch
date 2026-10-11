@@ -8,3 +8,4 @@ Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" |
 
 if (Test-Path $lnk) { Remove-Item $lnk }
 Write-Host '已停止并移除开机自启。不再需要的话可以直接删除本文件夹。'
+Write-Host 'Stopped and removed from startup. You can delete this folder if no longer needed.'

@@ -14,28 +14,28 @@ function Find-Python {
             if ($p) { return $p }
         } catch {}
     }
-    throw '需要 Python 3.11 或更新版本：https://www.python.org/downloads/ （安装时勾选 Add to PATH 和 tcl/tk）'
+    throw "需要 Python 3.11 或更新版本（安装时勾选 Add to PATH 和 tcl/tk）`nPython 3.11+ is required (check 'Add to PATH' and tcl/tk when installing): https://www.python.org/downloads/"
 }
 
-Write-Host '[1/4] 准备 Python 环境'
+Write-Host '[1/4] 准备 Python 环境 / Setting up Python environment'
 if (-not (Test-Path "$venv\Scripts\python.exe")) {
     & (Find-Python) -m venv $venv
 }
 & "$venv\Scripts\python.exe" -m pip install -q --disable-pip-version-check -r (Join-Path $root 'requirements.txt')
 
-Write-Host '[2/4] 停掉正在运行的旧实例'
+Write-Host '[2/4] 停掉正在运行的旧实例 / Stopping running instance'
 Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" |
     Where-Object CommandLine -match 'sonar_earbud_switch' |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 
-Write-Host '[3/4] 自动检测并生成配置'
+Write-Host '[3/4] 自动检测并生成配置 / Detecting devices and writing config'
 Push-Location $root
 try {
     & "$venv\Scripts\python.exe" -m sonar_earbud_switch setup
-    if ($LASTEXITCODE -ne 0) { throw '配置失败，按上面的提示处理后重新运行 install.ps1' }
+    if ($LASTEXITCODE -ne 0) { throw "配置失败，按上面的提示处理后重新运行 install.ps1`nSetup failed. Fix the issue above and run install.ps1 again." }
 } finally { Pop-Location }
 
-Write-Host '[4/4] 加入开机自启并启动'
+Write-Host '[4/4] 加入开机自启并启动 / Adding to startup and launching'
 $w = New-Object -ComObject WScript.Shell
 $s = $w.CreateShortcut($lnk)
 $s.TargetPath = "$venv\Scripts\pythonw.exe"
@@ -44,4 +44,4 @@ $s.WorkingDirectory = $root
 $s.Save()
 Start-Process "$venv\Scripts\pythonw.exe" -ArgumentList '-m sonar_earbud_switch' -WorkingDirectory $root
 
-Write-Host "完成。日志：$(Join-Path $root 'switch.log')"
+Write-Host "完成 / Done. 日志 / Log: $(Join-Path $root 'switch.log')"
