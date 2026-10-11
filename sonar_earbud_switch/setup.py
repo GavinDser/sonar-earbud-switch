@@ -9,16 +9,6 @@ import sys
 from . import config, drivers, sonar
 
 
-def _short(friendly):
-    # "Speakers (Logitech G560 Gaming Speaker)" -> "Logitech G560 Gaming Speaker"
-    # 去掉 Windows 加的 "4- " 这类编号前缀，编号会变
-    name = friendly
-    if "(" in name:
-        name = name[name.find("(") + 1 : name.rfind(")")]
-    head, sep, tail = name.partition("- ")
-    return tail if sep and head.strip().isdigit() else name
-
-
 def _choose(title, options, default_idx, assume_yes):
     print(f"\n{title}")
     for i, name in enumerate(options, 1):
@@ -78,27 +68,14 @@ def run(argv):
         print(f"[!] Sonar 设备列表里没找到名称含 “{kw}” 的输出设备，切换可能失败。")
         print(f"    No output device containing \"{kw}\" in Sonar; switching may fail.")
 
-    # 3. 回退设备（不知道之前用什么时，放回仓切到这里）
-    devs = [d for d in sonar.devices() if not d.get("isVad") and kw.lower() not in d["friendlyName"].lower()]
-    routes = sonar.routes()
     cfg = {k: dict(v) for k, v in config.DEFAULTS.items()}
     cfg["earbuds"].update(driver=drv_name, output=kw, mic=kw)
 
-    for flow, role, zh, en in (("render", "game", "输出", "output"), ("capture", "mic", "麦克风", "microphone")):
-        opts = [d for d in devs if d["dataFlow"] == flow]
-        if not opts:
-            print(f"[!] 没找到其他{zh}设备，回退{zh}留空（放回仓时只还原之前的设备）。")
-            print(f"    No other {en} device found; fallback left empty (only the previous device is restored).")
-            continue
-        cur = routes.get(role, "").lower()
-        default = next((i for i, d in enumerate(opts) if d["id"].lower() == cur), 0)
-        idx = _choose(
-            f"耳机放回仓时切回哪个{zh}设备？/ Which {en} to switch back to when earbuds are put away?",
-            [d["friendlyName"] for d in opts],
-            default,
-            assume_yes,
-        )
-        cfg["fallback"]["output" if flow == "render" else "mic"] = _short(opts[idx]["friendlyName"])
+    # 3. 提示设置 Sonar 的设备优先级列表（放回仓切到哪由它决定）
+    print("\n[i] 放回仓时切到哪个设备由 Sonar 的设备优先级列表决定，请在 Sonar 里排好顺序，")
+    print("    例如：Arctis > 本耳机 > 音箱（Arctis 开着就回 Arctis，关着就回音箱）。")
+    print("    Where audio goes on put-away is decided by Sonar's device priority list. Order it in Sonar,")
+    print("    e.g. Arctis > these earbuds > speakers (back to Arctis if it's on, otherwise speakers).")
 
     # 4. 写配置
     if os.path.exists(config.CONFIG_PATH) and not assume_yes:
