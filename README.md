@@ -16,7 +16,7 @@ Sonar auto-switches to SteelSeries headsets (e.g. Arctis Nova Pro) because their
 
 - **Take earbuds out → switch to them**; **put them back → restore** whatever Sonar was using before (e.g. your Arctis). Falls back to a configured device if unknown.
 - Opening the case lid alone does **not** switch.
-- **Volume keys → Sonar Master** while the earbuds are active (Windows volume keys otherwise only change Sonar's *Game* channel, so Discord/Chat stays loud). Shows a small on-screen indicator.
+- **Volume keys scale all Sonar channels together** while the earbuds are active, via Sonar's API master value (Windows volume keys otherwise only change Sonar's *Game* channel, so Discord/Chat stays loud). Channel ratios are kept. Shows a small on-screen indicator.
 - Devices matched **by name**, not by ID, so changing USB ports is fine.
 - Starts with Windows; single instance; logs to `switch.log`.
 
@@ -48,7 +48,7 @@ Uninstall: `powershell -ExecutionPolicy Bypass -File uninstall.ps1`.
 - Sonar **Classic** mode only.
 - No wear detection — the Cetra Open does not report it. "Taken out of case" is the trigger.
 - If the earbuds connect without reporting their in-case state, the tool falls back to "connected for 6 s".
-- Sonar's UI does not refresh Master volume changed via its API; reopen the window to see it.
+- The API master value is not the master slider shown in Sonar's UI: it scales the channel volumes (visible on the "SteelSeries Sonar - Gaming/Chat/…" devices in Windows), so the UI master slider does not move.
 - While active, Windows' own volume flyout does not appear (keys are intercepted).
 
 ### Adding other earbuds
@@ -65,7 +65,7 @@ Sonar 能自动切换 SteelSeries 耳机（如 Arctis Nova Pro），因为它们
 
 - **从仓里取出耳机 → 切过去**；**放回仓 → 还原**之前在用的设备（比如 Arctis）；不知道之前是什么时切到配置的回退设备。
 - 只打开仓盖**不会**切换。
-- 耳机在用时，**音量键改调 Sonar Master**（否则 Windows 音量键只会动 Game 通道，Discord 声音降不下来），并在屏幕左上角显示音量。
+- 耳机在用时，**音量键让 Sonar 所有通道一起按比例变**（通过 Sonar 接口的 master 值；否则 Windows 音量键只会动 Game 通道，Discord 声音降不下来），并在屏幕左上角显示音量。
 - 设备**按名称匹配**，换 USB 口不受影响。
 - 开机自启，只运行一个实例，日志在 `switch.log`。
 
@@ -97,7 +97,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 - 只支持 Sonar **Classic** 模式。
 - 没有佩戴检测（Cetra Open 不上报），以“从仓里取出”为准。
 - 如果耳机连上时没报仓内状态，退回“连上满 6 秒才切”。
-- 通过接口改的 Master 音量，Sonar 界面不会实时刷新，重开窗口可见。
+- 接口里的 master 值不是 Sonar 界面上的“主控”滑块：它按比例缩放各通道音量（在 Windows 的 “SteelSeries Sonar - Gaming/Chat/…” 设备上能看到变化），所以界面上的主控不会动。
 - 接管期间按音量键不会弹出 Windows 自带的音量框。
 
 ### 支持其他耳机

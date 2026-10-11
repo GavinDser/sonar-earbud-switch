@@ -130,12 +130,12 @@ def run():
                         if cur.get("game", "").lower() != target["game"].lower():
                             before = cur
                         sonar.set_routes(target)
-                        notify(f"已切到 {sonar.device_name(target['game'])}")
+                        notify(f"Switched to {sonar.device_name(target['game'])}")
                     else:
                         target = before or _fallback_routes(cfg)
                         if target:
                             sonar.set_routes(target)
-                            notify(f"已切回 {sonar.device_name(target['game'])}" if "game" in target else "已切回")
+                            notify(f"Switched back to {sonar.device_name(target['game'])}" if "game" in target else "Switched back")
                         before = None
                     applied = want
                     set_active(applied)
