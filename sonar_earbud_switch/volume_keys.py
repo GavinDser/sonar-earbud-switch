@@ -1,7 +1,9 @@
-"""接管系统音量键，改调 Sonar Master。
+"""接管系统音量键，改调 Sonar 当前输出的物理设备音量。
 
 Windows 默认输出是 "Sonar - Gaming"，系统音量键只会动 Game 通道，
-Chat（Discord）等不跟着变。启用时用低级键盘钩子吞掉音量加/减键。
+Chat（Discord）等不跟着变。启用时用低级键盘钩子吞掉音量加/减键，
+改调物理设备音量：它在 Sonar 混音之后，所有通道一起变。
+（Sonar API 的 classic master 值实测对 Chat 不起作用，不用它。）
 """
 import ctypes
 import ctypes.wintypes as wt
@@ -70,11 +72,12 @@ class VolumeKeys:
             while not self.q.empty():  # 连按/旋钮快转时合并
                 delta += self.q.get_nowait()
             try:
-                cur = sonar.master_volume()
+                dev = sonar.routes()["game"]
+                cur = sonar.device_volume(dev)
                 new = round(min(1.0, max(0.0, cur + delta)), 2)
-                sonar.set_master_volume(new)
-                log.info("master %.2f -> %.2f", cur, new)
+                sonar.set_device_volume(dev, new)
+                log.info("device volume %.2f -> %.2f", cur, new)
                 if self.osd:
-                    self.osd.show(f"Sonar Master  {round(new * 100)}%")
+                    self.osd.show(f"Volume  {round(new * 100)}%")
             except Exception as e:
-                log.warning("master volume failed: %s", e)
+                log.warning("device volume failed: %s", e)

@@ -19,7 +19,7 @@ Example list `Arctis > earbuds > speakers`: put the earbuds away → Arctis if i
 - **Take earbuds out → their devices appear**; **put them back → they disappear** and Sonar falls back per its priority list (output and mic).
 - Optional `force_on_takeout`: always switch to the earbuds on take-out, even if a higher-priority device is on.
 - Opening the case lid alone does **not** switch.
-- **Volume keys scale all Sonar channels together** while the earbuds are active, via Sonar's API master value (Windows volume keys otherwise only change Sonar's *Game* channel, so Discord/Chat stays loud). Channel ratios are kept. Shows a small on-screen indicator.
+- **Volume keys change the output device volume in Sonar** while the earbuds are active (Windows volume keys otherwise only change Sonar's *Game* channel, so Discord/Chat stays loud). This is the last stage after Sonar's mix, so game, chat and everything else change together. Shows a small on-screen indicator.
 - Devices matched **by name**, not by ID, so changing USB ports is fine.
 - Starts with Windows; single instance; logs to `switch.log`.
 
@@ -53,7 +53,7 @@ If the tool is killed while the earbuds are hidden, it restores them on next sta
 - Sonar **Classic** mode only.
 - No wear detection — the Cetra Open does not report it. "Taken out of case" is the trigger.
 - If the earbuds connect without reporting their in-case state, the tool falls back to "connected for 6 s".
-- The API master value is not the master slider shown in Sonar's UI: it scales the channel volumes (visible on the "SteelSeries Sonar - Gaming/Chat/…" devices in Windows), so the UI master slider does not move.
+- Sonar's API also exposes a "classic master" value, but in testing it did not affect the Chat channel, so it is not used.
 - While active, Windows' own volume flyout does not appear (keys are intercepted).
 
 ### Adding other earbuds
@@ -73,7 +73,7 @@ Sonar 有设备优先级列表，设备断开时会按列表回退。第三方�
 - **取出耳机 → 设备出现**；**放回仓 → 设备消失**，Sonar 按优先级列表回退（输出和麦克风都是）。
 - 可选 `force_on_takeout`：取出时强制切到耳机，即使列表里更高优先级的设备开着。
 - 只打开仓盖**不会**切换。
-- 耳机在用时，**音量键让 Sonar 所有通道一起按比例变**（通过 Sonar 接口的 master 值；否则 Windows 音量键只会动 Game 通道，Discord 声音降不下来），并在屏幕左上角显示音量。
+- 耳机在用时，**音量键改调 Sonar 里输出设备的音量**（否则 Windows 音量键只会动 Game 通道，Discord 声音降不下来）。这是 Sonar 混音之后的最后一级，游戏、Discord 等所有声音一起变，并在屏幕左上角显示音量。
 - 设备**按名称匹配**，换 USB 口不受影响。
 - 开机自启，只运行一个实例，日志在 `switch.log`。
 
@@ -107,7 +107,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 - 只支持 Sonar **Classic** 模式。
 - 没有佩戴检测（Cetra Open 不上报），以“从仓里取出”为准。
 - 如果耳机连上时没报仓内状态，退回“连上满 6 秒才切”。
-- 接口里的 master 值不是 Sonar 界面上的“主控”滑块：它按比例缩放各通道音量（在 Windows 的 “SteelSeries Sonar - Gaming/Chat/…” 设备上能看到变化），所以界面上的主控不会动。
+- Sonar 接口里还有一个 “classic master” 值，但实测它对 Chat 通道不起作用，所以没用它。
 - 接管期间按音量键不会弹出 Windows 自带的音量框。
 
 ### 支持其他耳机

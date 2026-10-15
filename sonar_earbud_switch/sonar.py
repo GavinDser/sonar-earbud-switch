@@ -81,9 +81,13 @@ def set_routes(role_devices):
         _put(f"/classicRedirections/{role}/deviceId/{urllib.parse.quote(dev, safe='')}")
 
 
-def master_volume():
-    return _get("/volumeSettings/classic")["masters"]["classic"]["volume"]
+def device_volume(device_id):
+    """物理设备音量（Sonar 混音之后、送进设备之前的最后一级，所有通道都受影响）。"""
+    for d in _get("/volumeSettings/devices/volumes"):
+        if d["deviceId"].lower() == device_id.lower():
+            return d["volume"]
+    raise LookupError(f"no volume for device {device_id}")
 
 
-def set_master_volume(v):
-    _put(f"/volumeSettings/classic/master/Volume/{v}")
+def set_device_volume(device_id, v):
+    _put(f"/volumeSettings/devices/{urllib.parse.quote(device_id, safe='')}/volume/{v}")
