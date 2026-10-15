@@ -53,7 +53,7 @@ unknown_state_delay = {t["unknown_state_delay"]}  # 仓内状态未知时连上�
 putback_debounce = {t["putback_debounce"]}     # 放回仓/断开后多久生效 / delay after put-away
 retry = {t["retry"]}                # 失败重试间隔 / retry interval
 
-[volume_keys]        # 耳机在用时音量键调 Sonar 所有通道 / volume keys scale all Sonar channels
+[volume_keys]        # 耳机在用时音量键调输出设备音量 / volume keys adjust the output device volume
 enabled = {str(v["enabled"]).lower()}
 step = {v["step"]}
 
